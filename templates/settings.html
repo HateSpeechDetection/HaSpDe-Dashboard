@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Hallintapaneeli{% endblock %}
+
+{% block content %}
+<main class="container mx-auto p-6">
+    <h2 class="text-2xl font-bold mb-6 text-center">Hallintapaneeli</h2>
+    
+    {% if pages %}
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-white shadow-md rounded-lg overflow-hidden border border-gray-300 mb-6">
+            <thead>
+                <tr class="bg-teal-600 text-white">
+                    <th class="py-3 px-4 border">Sivun nimi</th>
+                    <th class="py-3 px-4 border">Sivun ID</th>
+                    <th class="py-3 px-4 border">Kirosanojen suodatus</th>
+                    <th class="py-3 px-4 border">Havaintokynnys (%)</th>
+                    <th class="py-3 px-4 border">Ihmisen tarkistus</th>
+                    <th class="py-3 px-4 border">Asetukset</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for page in pages %}
+                <tr class="hover:bg-gray-100">
+                    <td class="py-2 px-4 border">{{ page.page_name }}</td>
+                    <td class="py-2 px-4 border">{{ page.page_id }}</td>
+                    <td class="py-2 px-4 border">
+                        <form method="POST" action="{{ url_for('settings.update_config', page_id=page.page_id) }}" class="inline">
+                            <select name="profanity_filter" class="border rounded p-1">
+                                <option value="on" {% if page['config']['profanity_filter'] %}selected{% endif %}>Päällä</option>
+                                <option value="off" {% if not page['config']['profanity_filter'] %}selected{% endif %}>Pois päältä</option>
+                            </select>
+                    </td>
+                    <td class="py-2 px-4 border">
+                        <input type="number" name="detection_threshold" value="{{ page['config']['detection_threshold'] }}" min="0" max="100" class="border rounded p-1" required>
+                        <small class="text-gray-500">Huom: Alle 65% on epävakaa.</small>
+                    </td>
+                    <td class="py-2 px-4 border">
+                        <select name="human_review" class="border rounded p-1">
+                            <option value="on" {% if page.config.human_review %}selected{% endif %}>Päällä</option>
+                            <option value="off" {% if not page.config.human_review %}selected{% endif %}>Pois päältä</option>
+                        </select>
+                    </td>
+                    <td class="py-2 px-4 border">
+                        <button type="submit" class="bg-teal-600 text-white rounded px-4 py-2 hover:bg-teal-500 transition">Tallenna</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="text-gray-700 text-center">Sinulla ei ole hallittavia sivuja.</p>
+    {% endif %}
+
+    {% if igs %}
+    <h3 class="text-xl font-semibold mt-6">Instagram-tilit</h3>
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-white shadow-md rounded-lg overflow-hidden border border-gray-300 mb-6">
+            <thead>
+                <tr class="bg-teal-600 text-white">
+                    <th class="py-3 px-4 border">Instagramin nimi</th>
+                    <th class="py-3 px-4 border">Instagramin ID</th>
+                    <th class="py-3 px-4 border">Kirosanojen suodatus</th>
+                    <th class="py-3 px-4 border">Havaintokynnys (%)</th>
+                    <th class="py-3 px-4 border">Ihmisen tarkistus</th>
+                    <th class="py-3 px-4 border">Asetukset</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ig in igs %}
+                <tr class="hover:bg-gray-100">
+                    <td class="py-2 px-4 border">{{ ig.name }}</td>
+                    <td class="py-2 px-4 border">{{ ig.id }}</td>
+                    <td class="py-2 px-4 border">
+                        <form method="POST" action="{{ url_for('settings.update_ig_config', ig_id=ig.id) }}" class="inline">
+                            <select name="profanity_filter_ig" class="border rounded p-1">
+                                <option value="on" {% if ig.config.profanity_filter %}selected{% endif %}>Päällä</option>
+                                <option value="off" {% if not ig.config.profanity_filter %}selected{% endif %}>Pois päältä</option>
+                            </select>
+                    </td>
+                    <td class="py-2 px-4 border">
+                        <input type="number" name="detection_threshold_ig" value="{{ ig.config.detection_threshold | default(65) }}" min="0" max="100" class="border rounded p-1" required>
+                        <small class="text-gray-500">Huom: Alle 65% on epävakaa.</small>
+                    </td>
+                    <td class="py-2 px-4 border">
+                        <select name="human_review_ig" class="border rounded p-1">
+                            <option value="on" {% if ig.config.human_review %}selected{% endif %}>Päällä</option>
+                            <option value="off" {% if not ig.config.human_review %}selected{% endif %}>Pois päältä</option>
+                        </select>
+                    </td>
+                    <td class="py-2 px-4 border">
+                        <button type="submit" class="bg-teal-600 text-white rounded px-4 py-2 hover:bg-teal-500 transition">Tallenna</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="text-gray-700 text-center">Sinulla ei ole hallittavia Instagram-tilejä.</p>
+    {% endif %}
+</main>
+{% endblock %}

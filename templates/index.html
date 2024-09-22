@@ -1,108 +1,29 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apply for AI Moderation</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        background-color: #f4f4f4;
-        color: #333;
-        margin: 0;
-        padding: 20px;
-      }
-      h2 {
-        color: #007BFF;
-      }
-      .form-container {
-        background-color: #fff;
-        padding: 20px;
-        border-radius: 5px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        max-width: 500px;
-        margin: auto;
-      }
-      .form-group {
-        margin-bottom: 15px;
-      }
-      .btn {
-        background-color: #007BFF;
-        color: white;
-        padding: 10px 15px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-      }
-      .btn:hover {
-        background-color: #0056b3;
-      }
-    </style>
-  </head>
-  <body>
+{% extends "base.html" %}
 
-    <div class="form-container">
-      <h2>Ota HaSpDe käyttöön!</h2>
-      <p id="profile"></p>
-      <button class="btn" id="fbLoginBtn">Login with Facebook</button>
+{% block title %}Ota HaSpDe käyttöön!{% endblock %}
+
+{% block content %}
+<script src="{{ url_for('static', filename='js/index.js')}}"></script>
+
+<div class="form-container bg-white shadow-lg rounded-lg p-6 max-w-md mx-auto mt-10">
+    <h2 class="text-3xl font-bold text-teal-600 mb-4">Ota HaSpDe käyttöön!</h2>
+    <p class="mb-4 text-gray-700">HaSpDe on tekoälyyn pohjautuva automaattinen vihapuheen suodatin, joka auttaa suojaamaan sinua verkossa.</p>
+    
+    <ul class="list-disc ml-6 mb-4 text-gray-800">
+        <li class="mb-2">🚫 Poistaa ja suodattaa kirosanoja</li>
+        <li class="mb-2">⚠️ Estää vihapuhetta ja uhkauksia</li>
+        <li class="mb-2">👥 Käyttää ihmisen tarkistusta tarpeen mukaan</li>
+    </ul>
+
+    <p class="mb-4 text-gray-700">HaSpDe on suunniteltu kaikille, erityisesti sosiaalisen median käyttäjille, jotka ovat vähemmistössä ja kokevat paljon vihapuhetta.</p>
+
+    <div class="flex flex-col space-y-2">
+        <button id="fbLoginBtn" class="btn bg-teal-600 text-white rounded-lg px-4 py-2 hover:bg-teal-500 transition">Kirjaudu sisään Facebookilla</button>
+        
+        <button class="btn bg-teal-400 text-white rounded-lg px-4 py-2 cursor-not-allowed opacity-50" disabled>
+            Kirjaudu sisään Instagramilla (Tulossa pian!)
+        </button>
     </div>
+</div>
 
-    <script>
-      // Add the Facebook SDK for JavaScript
-      (function(d, s, id){
-        var js, fjs = d.getElementsByTagName(s)[0];
-        if (d.getElementById(id)) {return;}
-        js = d.createElement(s); js.id = id;
-        js.src = "https://connect.facebook.net/en_US/sdk.js";
-        fjs.parentNode.insertBefore(js, fjs);
-      }(document, 'script', 'facebook-jssdk'));
-
-      window.fbAsyncInit = function() {
-        // Initialize the SDK
-        FB.init({
-          appId      : '485822284123595',  // Your app ID
-          xfbml      : true,
-          version    : 'v20.0'  // Graph API version
-        });
-
-        // Trigger Facebook login on button click
-        document.getElementById('fbLoginBtn').addEventListener('click', function() {
-          FB.login(function(response) {
-            console.log(response);
-            if (response.authResponse) {
-              // Send the authorization code to your server
-              fetch('/handle_fb_code', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                  code: response.authResponse.code
-                })
-              })
-              .then(response => response.json())
-              .then(data => {
-                if (data.success) {
-                  document.getElementById('profile').innerHTML = 
-                    "Käyttöönotto aloitettu onnistuneesti.";
-                  document.getElementById('fbLoginBtn').style.display = 'none';
-                } else {
-                  document.getElementById('profile').innerHTML = 
-                    "Error: " + data.error;
-                }
-              });
-            } else {
-              document.getElementById('profile').innerHTML = 
-                "Kirjautuminen keskeytetty tai ei viimeistelty.";
-            }
-          }, {
-            config_id: '1293007491679443',  // Your configuration ID
-            response_type: 'code',  // Required for System User Access Token
-            override_default_response_type: true
-          });
-        });
-      };
-    </script>
-
-  </body>
-</html>
+{% endblock %}
