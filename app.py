@@ -1,51 +1,28 @@
-from flask import Flask, render_template, request, redirect, url_for
-from flask_pymongo import PyMongo
-from flask_login import LoginManager, UserMixin, login_required
-from logging.handlers import RotatingFileHandler
-import os
-import logging
+from flask import Flask, render_template
+from flask_login import login_required
 from bson.objectid import ObjectId
 from werkzeug.middleware.proxy_fix import ProxyFix
 from status_package import Status
 
-from database_manager import DatabaseManager
-database_manager = DatabaseManager()
-
+# Internal imports
 from config import Config
+from models import User
+from utils import initialize_logging, initialize_blueprints, initialize_login_manager, initialize_database_manager, initialize_config
 
 # Initialize app
 app = Flask(__name__)
 
 # Load configuration from Config class
-app.config.from_object(Config)
-
-# Environment variables take precedence
-app.config['MONGO_URI'] = os.getenv('MONGO_URI', app.config['MONGO_URI'])
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', app.config['SECRET_KEY'])
-app.config['DEBUG'] = os.getenv('FLASK_DEBUG', app.config['DEBUG'])
-
-# Secure cookie settings
-app.config['SESSION_COOKIE_SECURE'] = True  # Ensure cookies are sent over HTTPS
-app.config['REMEMBER_COOKIE_SECURE'] = True
-app.config['SESSION_COOKIE_HTTPONLY'] = True  # Protect against JavaScript access
-app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # Mitigate CSRF attacks
-
-# Initialize MongoDB
-mongo = database_manager.get_db()
+app.config.from_object(Config())
+initialize_config(app)
 
 # Initialize the status checker
 status = Status(app, mongo_uri=app.config['MONGO_URI'])
 
-# Initialize Flask-Login
-login_manager = LoginManager()
-login_manager.init_app(app)
-login_manager.login_view = 'auth.login'
-
-# User class
-class User(UserMixin):
-    def __init__(self, user_id, email):
-        self.id = user_id
-        self.email = email
+login_manager = initialize_login_manager(app)
+initialize_logging(app)
+database_manager, mongo = initialize_database_manager()
+initialize_blueprints(app)
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -54,31 +31,8 @@ def load_user(user_id):
         return User(user_id=str(user_data['_id']), email=user_data['email'])
     return None
 
-# Setup logging
-if not os.path.exists('logs'):
-    os.mkdir('logs')
-    
-file_handler = RotatingFileHandler('logs/app.log', maxBytes=10240, backupCount=10)
-file_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
-file_handler.setLevel(logging.INFO)
-
-app.logger.addHandler(file_handler)
-app.logger.setLevel(logging.INFO)
-app.logger.info('Application startup')
-
 # Middleware for handling reverse proxy setups (e.g., NGINX)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_host=1)
-
-# Blueprints (ensure they're correctly imported)
-from instagram import instagram_bp
-from facebook import facebook_bp
-from auth import auth_bp
-from settings import settings_bp
-
-app.register_blueprint(instagram_bp)
-app.register_blueprint(facebook_bp)
-app.register_blueprint(auth_bp)
-app.register_blueprint(settings_bp)
 
 # Default route
 @app.route('/')

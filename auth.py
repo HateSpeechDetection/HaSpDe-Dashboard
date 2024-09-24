@@ -6,7 +6,7 @@ from models import User
 
 from database_manager import DatabaseManager
 
-database_manager = DatabaseManager()
+database_manager = DatabaseManager().get_instance()
 
 mongo = database_manager.get_db()
 auth_bp = Blueprint('auth', __name__)

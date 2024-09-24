@@ -1,49 +1,52 @@
 import logging
 import requests
 from flask import Blueprint, redirect, url_for, session, request
-from config import IG_SECRET, RED_URI
-from flask_login import login_required, current_user
+from config import Config
+from flask_login import current_user
 from database_manager import DatabaseManager
 
-database_manager = DatabaseManager()
-
+# Initialize the database manager and MongoDB connection
+database_manager = DatabaseManager().get_instance()
 mongo = database_manager.get_db()
 
+# Load configuration
+config = Config()
 
+# Create a Flask Blueprint for Instagram functionality
 instagram_bp = Blueprint('instagram', __name__)
 
-def exchange_short_lived_token(short_lived_token):
-    url = "https://graph.instagram.com/access_token"
-    params = {
-        'grant_type': 'ig_exchange_token',
-        'client_secret': IG_SECRET,
-        'short_lived_token': short_lived_token
-    }
-
-    response = requests.get(url, data=params)
-    return response.json()
+# Define a warning message
+warning_message = (
+    "# IMPORTANT: READ THIS BEFORE WASTING YOUR TIME!\n"
+    "# WARNING: The functionality in this module is currently NON-FUNCTIONAL due to ongoing issues with META Ltd.\n"
+    "# This serves as a critical warning to anyone attempting to implement or troubleshoot this code.\n"
+    "# The significant time and effort invested in resolving these issues—200 hours over 20-25 September 2024—have yielded no success.\n"
+    "# Proceed at your own risk, and consider seeking alternatives before diving into a frustrating experience!\n"
+    "# - botsarefuture"
+)
 
 @instagram_bp.route('/login/instagram')
 def login_instagram():
     logging.info("Redirecting user to Instagram login.")
-    return redirect(
-        f"https://www.instagram.com/oauth/authorize?client_id=1068378404891316&redirect_uri={RED_URI}&response_type=code&scope=instagram_basic"
-    )
+    return warning_message  # Return the warning message before handling
 
 @instagram_bp.route('/auth/instagram/callback')
 def instagram_callback():
-    code = request.args.get('code')
     logging.info("Instagram callback initiated.")
+    return warning_message  # Return the warning message before handling
+
+    # Note: The following code will never execute due to the early return.
+    code = request.args.get('code')
     if code:
         try:
             access_token_response = requests.post(
                 'https://api.instagram.com/oauth/access_token',
                 data={
-                    'client_id': '1068378404891316',
-                    'client_secret': IG_SECRET,
+                    'client_id': config.IG_CLIENT_ID,
+                    'client_secret': config.IG_APP_SECRET,
                     'code': code,
                     'grant_type': "authorization_code",
-                    "redirect_uri": RED_URI
+                    "redirect_uri": config.FB_REDIRECT_URI  # Corrected variable name
                 }
             )
             access_token_info = access_token_response.json()
@@ -78,11 +81,11 @@ def instagram_callback():
                     return redirect(url_for('index'))
 
             logging.error("Failed to retrieve access token: %s", access_token_info)
-            return "Authorization failed", 400
+            return warning_message  # Return the warning message if access token retrieval fails
 
         except Exception as e:
             logging.exception("Exception occurred during Instagram callback: %s", e)
-            return "Authorization failed", 500
+            return warning_message  # Return the warning message if an exception occurs
 
     logging.warning("No code received during Instagram callback.")
-    return "Authorization failed", 400
+    return warning_message  # Return the warning message if no code is received
