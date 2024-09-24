@@ -1,6 +1,6 @@
 import logging
 import requests
-from flask import Blueprint, redirect, url_for, session, request
+from flask import Blueprint, redirect, url_for, session, request, abort
 from config import Config
 from flask_login import current_user
 from database_manager import DatabaseManager
@@ -28,11 +28,14 @@ warning_message = (
 @instagram_bp.route('/login/instagram')
 def login_instagram():
     logging.info("Redirecting user to Instagram login.")
+    abort(501)
     return warning_message  # Return the warning message before handling
 
 @instagram_bp.route('/auth/instagram/callback')
 def instagram_callback():
     logging.info("Instagram callback initiated.")
+    abort(501)
+
     return warning_message  # Return the warning message before handling
 
     # Note: The following code will never execute due to the early return.

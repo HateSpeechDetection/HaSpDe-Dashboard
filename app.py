@@ -50,6 +50,10 @@ def internal_error(error):
     app.logger.error(f'Server error: {error}')
     return render_template('500.html'), 500
 
+@app.errorhandler(501)
+def handle_501_error(error):
+    return render_template('501.html'), 501
+
 # Run the app
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

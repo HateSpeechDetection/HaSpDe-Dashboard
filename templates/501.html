@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}501 - Not Implemented{% endblock %}
+
+{% block content %}
+    <div class="text-center bg-gray-100 text-black p-8 rounded-lg shadow-lg border border-gray-300">
+        <h2 class="text-3xl font-bold mb-4">⚠️ 501 - Not Implemented ⚠️</h2>
+        <p class="text-lg mb-4">❗️ Valitettavasti se ominaisuus, jota yritit käyttää, ei ole vielä toteutettu.</p>
+        <p class="text-lg mb-4">❗️ Unfortunately, the feature you attempted to access has not yet been implemented.</p>
+        <p class="text-lg mb-4">❗️ Tyvärr har den funktion du försökte använda inte implementerats än.</p>
+
+        <div class="bg-yellow-200 text-black p-4 rounded-lg mb-4">
+            <p class="font-bold text-xl">⚠️ HUOMIO! ⚠️</p>
+            <p>Tiimimme työskentelee ahkerasti uusien ominaisuuksien toteuttamiseksi.</p>
+            <p>Our team is diligently working on implementing new features.</p>
+            <p>Vårt team arbetar flitigt för att implementera nya funktioner.</p>
+        </div>
+
+        <p class="text-lg mb-4">Pyrimme parantamaan palveluamme jatkuvasti. Kiitos kärsivällisyydestäsi!</p>
+        <p class="text-lg mb-4">We are continually striving to improve our service. Thank you for your patience!</p>
+        <p class="text-lg mb-4">Vi strävar hela tiden efter att förbättra vår service. Tack för ditt tålamod!</p>
+        
+        <a href="/" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-400 transition">Takaisin etusivulle</a>
+        <div class="mt-6">
+            <p class="text-sm">Tarvitsetko apua? <a href="/contact" class="underline">Ota yhteyttä</a>!</p>
+            <p class="text-sm">Need assistance? <a href="/contact" class="underline">Get in touch</a>!</p>
+            <p class="text-sm">Behöver du hjälp? <a href="/contact" class="underline">Kontakta oss</a>!</p>
+        </div>
+    </div>
+
+    <style>
+        .animate-fade-in {
+            animation: fade-in 1s ease-in forwards;
+        }
+
+        @keyframes fade-in {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+    </style>
+{% endblock %}
