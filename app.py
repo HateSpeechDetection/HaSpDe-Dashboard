@@ -6,6 +6,7 @@ import os
 import logging
 from bson.objectid import ObjectId
 from werkzeug.middleware.proxy_fix import ProxyFix
+from status_package import Status
 
 from database_manager import DatabaseManager
 database_manager = DatabaseManager()
@@ -31,6 +32,9 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # Mitigate CSRF attacks
 
 # Initialize MongoDB
 mongo = database_manager.get_db()
+
+# Initialize the status checker
+status = Status(app, mongo_uri=app.config['MONGO_URI'])
 
 # Initialize Flask-Login
 login_manager = LoginManager()
